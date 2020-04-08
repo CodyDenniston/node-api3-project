@@ -16,22 +16,60 @@ router.get('/', (req, res) => {
 		});
 });
 
-router.get('/:id', (req, res) => {
-	// do your magic!
+router.get('/:id', validatePostId, (req, res) => {
+	Posts.getById(req.params.id)
+		.then((id) => {
+			res.status(200).json(id);
+		})
+		.catch((err) => {
+			res
+				.status(500)
+				.json({ message: 'there was an error retrieving post by id' });
+		});
 });
 
-router.delete('/:id', (req, res) => {
-	// do your magic!
+router.delete('/:id', validatePostId, (req, res) => {
+	Posts.remove(req.params.id)
+		.then((post) => {
+			res
+				.status(201)
+				.json({ message: 'The post was succesully removed from the database' });
+		})
+		.catch(() => {
+			res.status(500).json({
+				message: 'There was an error removing the post from the database',
+			});
+		});
 });
 
-router.put('/:id', (req, res) => {
-	// do your magic!
+router.put('/:id', validatePostId, (req, res) => {
+	Posts.update(req.params.id, req.body)
+		.then(() => {
+			Posts.getById(req.params.id).then((post) => {
+				res.status(201).json(post);
+			});
+		})
+		.catch(() => {
+			res.status(500).json({ message: 'There was an error updating the post' });
+		});
 });
 
 // custom middleware
 
 function validatePostId(req, res, next) {
-	// do your magic!
+	Posts.getById(req.params.id)
+		.then((post) => {
+			if (post) {
+				next();
+			} else {
+				res.status(404).json({ message: 'post not found' });
+			}
+		})
+		.catch(() => {
+			res.status(500).json({
+				message: 'There was an error fetching the post from the database',
+			});
+		});
 }
 
 module.exports = router;
