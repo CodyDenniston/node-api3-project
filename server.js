@@ -13,8 +13,8 @@ server.use('/api/user', userRouter);
 server.use('/api/posts', postRouter);
 
 server.get('/', (req, res) => {
-	const message = process.env.DEPLOYED || `I'M DEPLOYED ON HEROKU! C:`;
-	res.send(`<h2>Let's write some middleware!</h2>`, message);
+	const message = process.env.DEPLOYED || `I'M DEPLOYED ON HEROKU! `;
+	res.status(200).json({ message });
 });
 
 //custom middleware
